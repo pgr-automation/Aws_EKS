@@ -105,3 +105,36 @@ kubectl -n kube-system describe deployment aws-load-balancer-controller
 kubectl get pods -n kube-system
 kubectl -n kube-system logs -f <POD-NAME> 
 ```
+
+### 6. Verify TLS Certs for AWS Load Balancer Controller - Internals
+```bash
+# List aws-load-balancer-tls secret 
+kubectl -n kube-system get secret aws-load-balancer-tls -o yaml
+
+# Verify the ca.crt and tls.crt in below websites
+https://www.base64decode.org/
+https://www.sslchecker.com/certdecoder
+
+# Make a note of Common Name and SAN from above 
+Common Name: aws-load-balancer-controller
+SAN: aws-load-balancer-webhook-service.kube-system, aws-load-balancer-webhook-service.kube-system.svc
+
+# List Pods in YAML format
+kubectl -n kube-system get pods
+kubectl -n kube-system get pod <AWS-Load-Balancer-Controller-POD-NAME> -o yaml
+kubectl -n kube-system get pod aws-load-balancer-controller-65b4f64d6c-h2vh4 -o yaml
+Observation:
+1. Verify how the secret is mounted in AWS Load Balancer Controller Pod
+CHECK-2: Verify Volume Mounts
+    volumeMounts:
+    - mountPath: /tmp/k8s-webhook-server/serving-certs
+      name: cert
+      readOnly: true
+CHECK-3: Verify Volumes
+  volumes:
+  - name: cert
+    secret:
+      defaultMode: 420
+      secretName: aws-load-balancer-tls
+
+```
