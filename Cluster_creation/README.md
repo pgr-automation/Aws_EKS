@@ -98,13 +98,13 @@ eksctl create nodegroup --cluster=pgr-eksdemo \
 
 ### Verify NodeGroup subnets to confirm EC2 Instances are in Public Subnet
 - Verify the node group subnet to ensure it created in public subnets
-  - Go to Services -> EKS -> pgr-eksdemo -> eksdemo1-ng1-public
+  - Go to Services -> EKS -> pgr-eksdemo -> pgr-eksdemo-ng-public1
   - Click on Associated subnet in **Details** tab
   - Click on **Route Table** Tab.
   - We should see that internet route via Internet Gateway (0.0.0.0/0 -> igw-xxxxxxxx)
 
 ### Verify Cluster, NodeGroup in EKS Management Console
-- Go to Services -> Elastic Kubernetes Service -> eksdemo1
+- Go to Services -> Elastic Kubernetes Service -> pgr-eksdemo
 
 ### List Worker Nodes
 ```
@@ -119,6 +119,29 @@ kubectl get nodes -o wide
 
 # Our kubectl context should be automatically changed to new cluster
 kubectl config view --minify
+
+# Verfy EKS Cluster
+eksctl get cluster
+
+# Verify EKS Node Groups
+eksctl get nodegroup --cluster=eksdemo1
+
+# Verify if any IAM Service Accounts present in EKS Cluster
+eksctl get iamserviceaccount --cluster=eksdemo1
+Observation:
+1. No k8s Service accounts as of now. 
+
+# Configure kubeconfig for kubectl
+eksctl get cluster # TO GET CLUSTER NAME
+aws eks --region <region-code> update-kubeconfig --name <cluster_name>
+aws eks --region us-east-1 update-kubeconfig --name eksdemo1
+
+# Verify EKS Nodes in EKS Cluster using kubectl
+kubectl get nodes
+
+# Verify using AWS Management Console
+1. EKS EC2 Nodes (Verify Subnet in Networking Tab)
+2. EKS Cluster
 ```
 
 ### Verify Worker Node IAM Role and list of Policies
