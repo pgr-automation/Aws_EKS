@@ -30,7 +30,6 @@ To deploy an ALB Ingress in your Kubernetes cluster, you would typically define 
 ## Configure
 
 ### 1. Define an IngressClass
-
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
@@ -42,9 +41,6 @@ spec:
 ```
 
 ### 2.  Create an Ingress Resource
-
-
-
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
