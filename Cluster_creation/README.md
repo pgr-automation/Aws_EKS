@@ -72,7 +72,28 @@ eksctl create nodegroup --cluster=pgr-eksdemo \
                         --appmesh-access \
                         --alb-ingress-access 
 ```
+* #  Create EKS Node Group in Private Subnets
+- Create Private Node Group in a Cluster
+- Key option for the command is `--node-private-networking`
 
+```bash
+eksctl create nodegroup --cluster=pgr-eksdemo \
+                        --region=us-east-1 \
+                        --name=pgr-eksdemo-ng-private \
+                        --node-type=t3.medium \
+                        --nodes-min=2 \
+                        --nodes-max=4 \
+                        --node-volume-size=20 \
+                        --ssh-access \
+                        --ssh-public-key=kube-demo \
+                        --managed \
+                        --asg-access \
+                        --external-dns-access \
+                        --full-ecr-access \
+                        --appmesh-access \
+                        --alb-ingress-access \
+                        --node-private-networking                       
+```
 ## Step-05: Verify Cluster & Nodes
 
 ### Verify NodeGroup subnets to confirm EC2 Instances are in Public Subnet
