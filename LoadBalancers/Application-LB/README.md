@@ -262,3 +262,9 @@ https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/m
     ]
 }
 ```
+
+```bash
+aws iam create-policy \
+    --policy-name AWSLoadBalancerControllerIAMPolicy \
+    --policy-document file://iam_policy_latest.json
+```
