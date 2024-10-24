@@ -54,4 +54,36 @@ eksctl create iamserviceaccount \
   ```bash
 kubectl get sa -n kube-system
 kubectl get sa aws-load-balancer-controller -n kube-system
+kubectl describe sa aws-load-balancer-controller -n kube-system
+```
+
+### 3. Install the AWS Load Balancer Controller using Helm
+#### Install AWS Load Balancer Controller
+- Note-1: If you're deploying the controller to Amazon EC2 nodes that have restricted access to the Amazon EC2 instance metadata service (IMDS), or if you're deploying to Fargate, then add the following flags to the command that you run:
+```bash
+--set region=region-code
+--set vpcId=vpc-xxxxxxxx
+```
+- Note-2: If you're deploying to any Region other than us-west-2, then add the following flag to the command that you run, replacing account and region-code with the values for your region listed in Amazon EKS add-on container image addresses.
+```bash
+--set image.repository=account.dkr.ecr.region-code.amazonaws.com/amazon/aws-load-balancer-controller
+```
+
+```bash
+# Add the eks-charts repository.
+helm repo add eks https://aws.github.io/eks-charts
+
+# Update your local repo to make sure that you have the most recent charts.
+helm repo update
+
+# Install the AWS Load Balancer Controller.
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+  -n kube-system \
+  --set clusterName=<cluster-name> \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller \
+  --set region=<region-code> \
+  --set vpcId=<vpc-xxxxxxxx> \
+  --set image.repository=<account>.dkr.ecr.<region-code>.amazonaws.com/amazon/aws-load-balancer-controller
+
 ```
