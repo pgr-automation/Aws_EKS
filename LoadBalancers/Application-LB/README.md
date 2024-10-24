@@ -69,6 +69,11 @@ kubectl describe sa aws-load-balancer-controller -n kube-system
 --set image.repository=account.dkr.ecr.region-code.amazonaws.com/amazon/aws-load-balancer-controller
 ```
 
+ - **EndPoints**
+ ```url 
+ https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html
+ ```
+
 ```bash
 # Add the eks-charts repository.
 helm repo add eks https://aws.github.io/eks-charts
