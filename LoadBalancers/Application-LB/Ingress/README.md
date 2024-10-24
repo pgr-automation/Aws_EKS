@@ -64,3 +64,11 @@ spec:
               number: 80
 
 ```
+
+```bash
+# Verify IngressClass Resource
+kubectl get ingressclass
+
+# Describe IngressClass Resource
+kubectl describe ingressclass alb
+```
