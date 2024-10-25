@@ -4,8 +4,8 @@ When setting up an ALB (Application Load Balancer) Ingress for Kubernetes, the a
 
 ### 1. General Annotations
 
-- #  kubernetes.io/ingress.class:
- Specifies the Ingress controller to use. For ALB, set it to alb.
+-  kubernetes.io/ingress.class:
+   Specifies the Ingress controller to use. For ALB, set it to alb.
 ```bash
 kubernetes.io/ingress.class: alb
 ```
