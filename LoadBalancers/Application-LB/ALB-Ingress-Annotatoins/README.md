@@ -118,7 +118,7 @@ metadata:
   name: example-ingress
   namespace: default
   annotations:
-    kubernetes.io/ingress.class: alb
+    kubernetes.io/ingress.class: alb # Deprecated use IngressClassName
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:region:account-id:certificate/certificate-id

@@ -31,78 +31,75 @@ The **Amazon EBS CSI (Elastic Block Store Container Storage Interface) driver** 
 
 ## How to Use the EBS CSI Driver
 
-### 1. Install the EBS CSI Driver
+## EKS Storage with EBS - Elastic Block Store
 
-Ensure your EKS cluster is running a supported version of Kubernetes (1.14+). Install the EBS CSI driver using `kubectl` or Helm. The following command installs it via Helm:
+## Step-01: Introduction
+- Create IAM Policy for EBS
+- Associate IAM Policy to Worker Node IAM Role
+- Install EBS CSI Driver
 
-```bash
+## Step-02:  Create IAM policyy
+- Go to Services -> IAM
+- Create a Policy 
+  - Select JSON tab and copy paste the below JSON
+```json
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AttachVolume",
+        "ec2:CreateSnapshot",
+        "ec2:CreateTags",
+        "ec2:CreateVolume",
+        "ec2:DeleteSnapshot",
+        "ec2:DeleteTags",
+        "ec2:DeleteVolume",
+        "ec2:DescribeInstances",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeTags",
+        "ec2:DescribeVolumes",
+        "ec2:DetachVolume"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+  - Review the same in **Visual Editor** 
+  - Click on **Review Policy**
+  - **Name:** Amazon_EBS_CSI_Driver
+  - **Description:** Policy for EC2 Instances to access Elastic Block Store
+  - Click on **Create Policy**
+
+## Step-03: Get the IAM role Worker Nodes using and Associate this policy to that role
+```
+# Get Worker node IAM Role ARN
+kubectl -n kube-system describe configmap aws-auth
+
+# from output check rolearn
+rolearn: arn:aws:iam::180789647333:role/eksctl-eksdemo1-nodegroup-eksdemo-NodeInstanceRole-IJN07ZKXAWNN
+```
+- Go to Services -> IAM -> Roles 
+- Search for role with name **eksctl-eksdemo1-nodegroup** and open it
+- Click on **Permissions** tab
+- Click on **Attach Policies**
+- Search for **Amazon_EBS_CSI_Driver** and click on **Attach Policy**
+
+## Step-04: Deploy Amazon EBS CSI Driver  
+- Verify kubectl version, it should be 1.14 or later
+```
+kubectl version --client --short
+```
+- Deploy Amazon EBS CSI Driver
+```
+# Deploy EBS CSI Driver
 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 helm install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver \
 --namespace kube-system
-```
 
-### 2. Create a StorageClass
-Define a StorageClass to specify the type of EBS volume and any additional parameters, such as encryption or IOPS:
-
-```yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: ebs-sc
-provisioner: ebs.csi.aws.com
-parameters:
-  type: gp2
-  fsType: ext4
-reclaimPolicy: Retain
-volumeBindingMode: WaitForFirstConsumer
-```
-### 3. Create a PersistentVolumeClaim (PVC)
-Create a PersistentVolumeClaim that references the StorageClass:
-
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ebs-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ebs-sc
-  resources:
-    requests:
-      storage: 10Gi
-```
-### 4. Attach the Volume to a Pod
-
-Once the PVC is created, you can attach it to a Pod in the Kubernetes deployment:
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: ebs-pod
-spec:
-  containers:
-  - name: my-container
-    image: nginx
-    volumeMounts:
-    - mountPath: "/var/lib/data"
-      name: ebs-volume
-  volumes:
-  - name: ebs-volume
-    persistentVolumeClaim:
-      claimName: ebs-pvc
-```
-### 5. Manage Snapshots (Optional)
-
-You can create snapshots from an EBS volume for backup purposes. The CSI driver supports snapshot creation and management using Kubernetes resources.
-Example of Creating a Snapshot:
-```yaml
-apiVersion: snapshot.storage.k8s.io/v1beta1
-kind: VolumeSnapshot
-metadata:
-  name: ebs-snapshot
-spec:
-  volumeSnapshotClassName: ebs-csi-snapshot
-  source:
-    persistentVolumeClaimName: ebs-pvc
+# Verify ebs-csi pods running
+kubectl get pods -n kube-system
 ```
